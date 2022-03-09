@@ -1,0 +1,28 @@
+import heapq
+
+def solution(scoville, K):
+    
+    answer = 0
+    
+    heapq.heapify(scoville)
+    
+    one = heapq.heappop(scoville)
+    
+    if one >= K:
+        return 0
+    
+    while True:
+        
+        if not scoville:
+            return -1
+        
+        two = heapq.heappop(scoville)
+        
+        one = heapq.heappushpop(scoville, one + (two * 2))
+        
+        answer += 1
+        
+        if one >= K:
+            break
+    
+    return answer
