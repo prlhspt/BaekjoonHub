@@ -1,0 +1,23 @@
+from collections import defaultdict
+from collections import deque
+
+
+def solution(tickets):
+    tickets.sort(key=lambda x: (x[0], x[1]))
+
+    d = defaultdict(deque)
+
+    for k, v in tickets:
+        d[k].append(v)
+
+    stack = ['ICN']
+    path = []
+
+    while len(stack) > 0:
+        top = stack[-1]
+        if top not in d or len(d[top]) == 0:
+            path.append(stack.pop())
+        else:
+            stack.append(d[top].popleft())
+
+    return path[::-1]
