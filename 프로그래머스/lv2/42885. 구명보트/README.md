@@ -1,6 +1,6 @@
 # [level 2] 구명보트 - 42885 
 
-[문제 링크](https://programmers.co.kr/learn/courses/30/lessons/42885?language=java) 
+[문제 링크](https://programmers.co.kr/learn/courses/30/lessons/42885) 
 
 ### 성능 요약
 

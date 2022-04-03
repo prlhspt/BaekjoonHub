@@ -5,31 +5,31 @@ class Solution {
     public int solution(int[] people, int limit) {
         int boat = 0;
 
-        List<Integer> peopleList = Arrays.stream(people)
+        Arrays.sort(people);
+
+        ArrayDeque<Integer> peopleDeq = Arrays.stream(people)
                 .boxed()
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(() -> new ArrayDeque<>()));
 
-        Collections.sort(peopleList);
-        int left = 0;
-        int right = peopleList.size() - 1;
 
-        while (peopleList.size() > 0) {
-            int p = peopleList.get(left);
-            left++;
-            
-            if (p > (limit / 2)) {
-                boat += peopleList.size();
-                break;
+        // {30, 50, 50, 70, 80};
+        // 왼쪽 + 오른쪽 해서 limit 아래면 두명 보트에 태우면 됨
+        while (peopleDeq.size() > 1) {
+            int firstP = peopleDeq.peekFirst();
+            int lastP = 0;
+            while (peopleDeq.size() > 0) {
+                lastP = peopleDeq.pollLast();
+                boat++;
+                // 30 + 80 <= 100 X 80만 타고 보내기
+                // 30 + 70 <= 100 O
+                if (firstP + lastP <= limit) {
+                    peopleDeq.pollFirst();
+                    break;
+                }
             }
+        }
 
-            // [50, 50, 70, 80] 이면 50 꺼내고 80부터 돌면 될 듯?
-            // p는 50이고, i는 80, 70, 50 ...
-             for (int i = right; i >= 0; i--) {
-                 if (peopleList.get(i) <= (limit - p)) {
-                     right--;
-                     break;
-                 }
-             }
+        if (peopleDeq.size() == 1) {
             boat++;
         }
 
