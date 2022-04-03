@@ -20,14 +20,6 @@ class Disk {
     public int getOperationTime() {
         return operationTime;
     }
-
-    @Override
-    public String toString() {
-        return "Disk{" +
-                "startTime=" + startTime +
-                ", operationTime=" + operationTime +
-                '}';
-    }
 }
 
 class Solution {
@@ -70,11 +62,8 @@ class Solution {
 
             if ((cDisk != null && cDisk.getStartTime() >= time) && tempTask.isEmpty()) {
                 if (time <= cDisk.getStartTime()) {
-                    time += (cDisk.getStartTime() + cDisk.getOperationTime());
+                    time = (cDisk.getStartTime() + cDisk.getOperationTime());
                     answer += cDisk.getOperationTime();
-                } else {
-                    time += (cDisk.getStartTime() + cDisk.getOperationTime());
-                    answer += (time - cDisk.getStartTime());
                 }
             } else {
                 while (cDisk != null && cDisk.getStartTime() < time) {
