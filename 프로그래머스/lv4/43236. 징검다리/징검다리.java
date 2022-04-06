@@ -1,11 +1,14 @@
 /*
-결정 문제 : 심사에 걸리는 시간을 mid라고 했을 때 n명이 times안에 심사할 수 있는가?
-Check(mid) = T -> T -> ... -> F -> F
+결정 문제 : 바위 사이의 거리들 중 최소 거리를 mid으로 뒀을 때 돌을 n개만 치울 수 있는가?
+Check(mid) = F -> F -> ... -> T -> T -> ... -> F -> F
+구하는 답은 mid(바위 거리들 중 최소 거리)의 최댓값이므로 T에서 F로 변하는 경계까지 가서 T를 선택하면 된다.
 
 Checklist
-1. Check(lo) = F, Check(hi) = T를 만족하는가?
+1. Check(lo) = T, Check(hi) = F를 만족하는가?
 2. lo, hi는 정답이 될 수 있는 모든 범위를 나타낼 수 있는가?
- */
+
+* 바위의 거리 배열에서 바위를 지우면 그 오른쪽의 거리에 더해진다.
+*/
 
 import java.util.*;
 
@@ -23,28 +26,16 @@ class Solution {
         }
         disArr[disArr.length - 1] = distance - rocks[rocks.length - 1];
 
-        // System.out.println(Arrays.toString(disArr));
-
         long low = -1;
         long high = distance + 1;
-
-        // [2, 11, 14, 17, 21]
-        // [2, 9, 3, 3, 4, 4]
-        // [25]
-        // 13일때 2, 9 지우고 오른쪽 3에 합치면 13
-        // 4, 4 지우고 왼쪽 3에 합치면 11
 
         while (low + 1 < high) {
             long mid = low + (high - low) / 2;
 
-            // System.out.println("mid : " + mid);
-            
             long sum = 0;
             long remove = 0;
             for (int i = 0; i < disArr.length; i++) {
                 sum += disArr[i];
-                // System.out.println("sum : " + sum);
-                // System.out.println("remove : " + remove);
 
                 if (sum >= mid) {
                     sum = 0;
@@ -52,18 +43,13 @@ class Solution {
                 }
                 remove++;
             }
-                // System.out.println("remove : " + remove);
             
             if (remove > n) {
                 high = mid;
             } else if (remove <= n) {
                 low = mid;
             }
-            // System.out.println("low : " + low);
-            // System.out.println("high : " + high);
         }
-
-        // System.out.print(high);
 
         return (int) low;
     }
