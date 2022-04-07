@@ -1,63 +1,42 @@
-/** 
-인접한 집은 못훔침
-집이 원형이라 0번 인덱스랑 마지막 인덱스도 비교해줘야 함
-1, 2, 3, 1
+/*
+결정 문제 : 심사에 걸리는 시간을 mid라고 했을 때 n명이 times안에 심사할 수 있는가?
+Check(mid) = F -> F -> ... -> T -> T
 
-0, 1번은 그냥 패스
-2번은 max(1번까지 털 수 있는 돈, 0번까지 털 수 있는 돈 + 2번의 돈)
-이렇게 하면 집이 원형으로 안 연결되어있다는 가정 하에 최댓값
+Checklist
+1. Check(lo) = F, Check(hi) = T를 만족하는가?
+2. lo, hi는 정답이 될 수 있는 모든 범위를 나타낼 수 있는가?
+ */
 
-[10, 2, 5, 30]
-10이랑 30이 안붙어있으면 40
-10이랑 30이 붙어있으면 32
-
-[10, 2, 5, 30, 40]
-10이랑 40이 안붙어있으면 55
-10이랑 40이 붙어있으면 45
-
-[2, 5, 30, 40]
-이면 
-2부터 시작해서 45
-
-[10, 2, 3, 30]
-32
-
-[40, 2, 3, 30]
-
-*/
-
+import java.math.BigInteger;
 import java.util.*;
 
 class Solution {
-    
-    void reverseArray(int[] arr) {
-        int length = arr.length;
-        for (int i = 0; i < length / 2; i++) {
-            int temp = arr[i];
-            arr[i] = arr[length - 1 - i];
-            arr[length - 1 - i] = temp;
+
+    boolean check(int[] arr, long mid, int target) {
+        long sum = 0;
+        for (int i = 0; i < arr.length; i++) {
+            sum += (mid / arr[i]);
         }
+        return sum >= target;
     }
-    
-    public int solution(int[] money) {
 
-        int[] moneyClone = money.clone();
 
-        // 앞에서부터 뒤로 가기
-        money[1] = Math.max(money[0], money[1]);
+    public long solution(int n, int[] times) {
+        Arrays.sort(times);
 
-        for (int i = 2; i < money.length-1; i++) {
-            money[i] = Math.max(money[i-2] + money[i], money[i-1]);
+        long low = -1;
+        long high = (long) n * (long) times[times.length - 1] + 1;
+
+        // low와 high 사이에는 서로 다른 칸이 존재한다. (F -> T가 되는 경계)
+        while (low + 1 < high) {
+            long mid = low + (high - low) / 2;
+
+            if (check(times, mid, n)) {
+                high = mid;
+            } else {
+                low = mid;
+            }
         }
-
-        // 뒤에서부터 앞으로 가기
-        reverseArray(moneyClone);
-        moneyClone[1] = Math.max(moneyClone[0], moneyClone[1]);
-
-        for (int i = 2; i < money.length-1; i++) {
-            moneyClone[i] = Math.max(moneyClone[i-2] + moneyClone[i], moneyClone[i-1]);
-        }
-
-        return Math.max(moneyClone[money.length - 2], money[money.length - 2]);
-     }
+        return high;
+    }
 }
