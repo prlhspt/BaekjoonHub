@@ -56,7 +56,61 @@ class Solution {
             this.externalLink = externalLink;
         }
 
+    }
 
+    public String findURL(String page) {
+        String url = "";
+        Matcher homeMatcher = Pattern.compile("<meta property=\"og:url\" content=\"https://(\\S*)\"")
+                .matcher(page);
+        while (homeMatcher.find()) {
+            url = homeMatcher.group(1);
+        }
+        return url;
+    }
+
+    public List<String> findReferenceURL(String page) {
+        ArrayList<String> referenceUrl = new ArrayList<>();
+
+        Matcher referenceMatcher = Pattern.compile("<a href=\"https://(\\S*)\"").matcher(page);
+        while (referenceMatcher.find()) {
+            referenceUrl.add(referenceMatcher.group(1));
+        }
+
+        return referenceUrl;
+    }
+
+    public int findWordCount(String page, String word) {
+        String body = page.split("<body>")[1].split("</body>")[0].replaceAll("\\d", " ");
+        Matcher bodyMatcher = Pattern.compile("\\b(?i)" + word + "\\b").matcher(body);
+        int wordCount = 0;
+        while (bodyMatcher.find()) {
+            wordCount++;
+        }
+        return wordCount;
+    }
+    
+    public void computeScore(Map<String, PageInfo> pageInfoMap) {
+        for(PageInfo pageInfo : pageInfoMap.values()) {
+            for (String externalLink : pageInfo.getExternalLink()) {
+                if (pageInfoMap.containsKey(externalLink)) {
+                    pageInfoMap.get(externalLink).defaultScore += pageInfo.getLinkScore();
+                }
+            }
+        }
+    }
+    
+    public int computeIndex(Map<String, PageInfo> pageInfoMap) {
+        double maxScore = 0;
+        int answer = 0;
+        for (PageInfo pageInfo : pageInfoMap.values()) {
+            if (pageInfo.getDefaultScore() == maxScore && pageInfo.getIndex() < answer) {
+                answer = pageInfo.index;
+            } else if (pageInfo.defaultScore > maxScore) {
+                answer = pageInfo.index;
+                maxScore = pageInfo.getDefaultScore();
+            }
+        }
+        return answer;
     }
 
     public int solution(String word, String[] pages) {
@@ -66,56 +120,25 @@ class Solution {
 
         HashMap<String, PageInfo> pageInfoMap = new HashMap<>();
 
-        String url = "";
 
         for (int i = 0; i < pages.length; i++) {
             pages[i] = pages[i].toLowerCase();
-            Matcher homeMatcher = Pattern.compile("<meta property=\"og:url\" content=\"https://(\\S*)\"").matcher(pages[i]);
-            while (homeMatcher.find()) {
-                url = homeMatcher.group(1);
-            }
 
+            String url = findURL(pages[i]);
             PageInfo pageInfo = new PageInfo(i, url);
 
-            ArrayList<String> referenceUrl = new ArrayList<>();
+            List<String> referenceURL = findReferenceURL(pages[i]);
+            pageInfo.setExternalLink(referenceURL);
 
-            Matcher referenceMatcher = Pattern.compile("<a href=\"https://(\\S*)\"").matcher(pages[i]);
-            while (referenceMatcher.find()) {
-                referenceUrl.add(referenceMatcher.group(1));
-            }
-            pageInfo.setExternalLink(referenceUrl);
-
-            String body = pages[i].split("<body>")[1].split("</body>")[0].replaceAll("\\d", " ");
-            Matcher bodyMatcher = Pattern.compile("\\b(?i)" + word + "\\b").matcher(body);
-            int wordCount = 0;
-            while (bodyMatcher.find()) {
-                wordCount++;
-            }
-
+            int wordCount = findWordCount(pages[i], word);
             pageInfo.computeScore(wordCount);
 
             pageInfoMap.put(pageInfo.getUrl(), pageInfo);
         }
+        
+        computeScore(pageInfoMap);
 
-        for(PageInfo pageInfo : pageInfoMap.values()) {
-            for (String externalLink : pageInfo.getExternalLink()) {
-                if (pageInfoMap.containsKey(externalLink)) {
-                    pageInfoMap.get(externalLink).defaultScore += pageInfo.getLinkScore();
-                }
-            }
-        }
-
-        double maxScore = 0;
-
-        for (PageInfo pageInfo : pageInfoMap.values()) {
-            if (pageInfo.getDefaultScore() == maxScore && pageInfo.getIndex() < answer) {
-                answer = pageInfo.index;
-            } else if (pageInfo.defaultScore > maxScore) {
-                answer = pageInfo.index;
-                maxScore = pageInfo.getDefaultScore();
-            }
-        }
-
+        answer = computeIndex(pageInfoMap);
 
         return answer;
     }
