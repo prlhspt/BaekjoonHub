@@ -11,10 +11,6 @@ class Solution {
         Queue<Integer> maxQueue = new PriorityQueue<>(Collections.reverseOrder());
         Queue<Integer> minQueue = new PriorityQueue<>();
 
-        int iCount = 0;
-        int dCount = 0;
-
-
         for (int i = 0; i < operations.length; i++) {
             String[] s = operations[i].split(" ");
 
@@ -22,41 +18,28 @@ class Solution {
             if (s[0].equals("I")) {
                 maxQueue.offer(Integer.parseInt(s[1]));
                 minQueue.offer(Integer.parseInt(s[1]));
-                iCount++;
 
             } else {
                 // 최댓값 제거
                 if (s[1].equals("1")) {
                     if (!maxQueue.isEmpty()) {
-                        maxQueue.poll();
-                        dCount++;
+                        int max = maxQueue.poll();
+                        minQueue.remove(max);
                     }
 
                     // 최솟값 제거
                 } else {
                     if (!minQueue.isEmpty()) {
-                        minQueue.poll();
-                        dCount++;
+                        int min = minQueue.poll();
+                        maxQueue.remove(min);
                     }
-
                 }
             }
-            
-            if (iCount == dCount) {
-                maxQueue = new PriorityQueue<>(Collections.reverseOrder());
-                minQueue = new PriorityQueue<>();
-                iCount = 0;
-                dCount = 0;
-            }
-            
         }
-
-        if (dCount >= iCount) {
-            answer[0] = 0;
-            answer[1] = 0;
-        } else {
+        
+        if (maxQueue.size() > 1) {
             answer[0] = maxQueue.poll();
-            answer[1] = minQueue.poll();
+            answer[1] = minQueue.poll();    
         }
 
         return answer;
