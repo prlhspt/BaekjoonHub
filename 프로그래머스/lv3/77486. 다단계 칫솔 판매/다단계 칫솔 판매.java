@@ -1,75 +1,50 @@
-// 위상 정렬 느낌으로 각자 나한테 오는 노드 개수가 0개인 것부터 시작해서, 퍼져나가면서 -1 해서 계산하면 될 듯
-// 계산은 맨 끝에서부터 진행하는게 맞음 그래야 n번 탐색으로 끝낼 수 있음
-
 import java.util.*;
 
 class Solution {
     
-    boolean[] visited;
-    String[] Enroll;
-    String[] Seller;
-    String[] Amount;
-    
-    Map<String, String> map;
-    Map<String, Integer> moneyMap;
-    
-    public void dfs(String start, int money) {
+    class Person {
+        String name;
+        Person parent;
+        int money;
         
-        if (money <= 0) {
-            return;
+        public Person(String name, Person parent, int money) {
+            this.name = name;
+            this.parent = parent;
+            this.money = money;
         }
         
-        String parent = map.get(start);
-        
-        if (parent.equals("")) {
-            int rest = money * 10 / 100;
-            money -= rest;
-            moneyMap.put("center", moneyMap.get("center") + rest);
-            moneyMap.put(start, moneyMap.get(start) + money);
-            return;
+        public void getReward(int pureMoney) {
+            if (pureMoney <= 0) return;
             
-        } else {
-            int rest = money * 10 / 100;
-            money -= rest;
-            moneyMap.put(start, moneyMap.get(start) + money);
-            dfs(parent, rest);
+            int rest = (int) (pureMoney * 0.1);
+            money += (pureMoney - rest);
+            if (parent != null) 
+                this.parent.getReward(rest);
         }
         
     }
     
     public int[] solution(String[] enroll, String[] referral, String[] seller, int[] amount) {
         
-        Enroll = enroll;
-        Seller = seller;
+        int[] answer = new int[enroll.length];
         
-        int[] result = new int[enroll.length];
+        Map<String, Person> personMap = new HashMap<>();
         
-        map = new HashMap<>();
-        moneyMap = new HashMap<>();
+        for (int i = 0; i < enroll.length; i++) 
+            personMap.put(enroll[i], new Person(enroll[i], null, 0));
         
-        visited = new boolean[enroll.length];
+        for (int i = 0; i < enroll.length; i++)
+            if (!referral[i].equals("-")) 
+                personMap.get(enroll[i]).parent = personMap.get(referral[i]);
         
-        moneyMap.put("center", 0);
-        
+        for (int i = 0; i < seller.length; i++)
+            personMap.get(seller[i]).getReward(amount[i] * 100);
+
         for (int i = 0; i < enroll.length; i++) {
-            moneyMap.put(enroll[i], 0);
-            if (!referral[i].equals("-")) {
-                map.put(enroll[i], referral[i]);
-            } else {
-                map.put(enroll[i], "");
-            }
+            answer[i] = personMap.get(enroll[i]).money;
         }
         
-        for (int i = 0; i < seller.length; i++) {
-            int money = amount[i] * 100;
-            dfs(seller[i], money);
-        }
-        
-        for (int i = 0; i < enroll.length; i++) {
-            result[i] = moneyMap.get(enroll[i]);
-        }
-        
-        return result;
-        
-        }
+        return answer;
+            
+    }
 }
