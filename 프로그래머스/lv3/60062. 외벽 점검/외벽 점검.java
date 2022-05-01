@@ -4,73 +4,55 @@ class Solution {
     
     static int INF = 987654321;
     
-    int[] temp;
-    boolean[] visited;
+    int N, MinCnt;
+    int[] Weak;
+    int[] Dist;
     
-    List<int[]> resultList = new ArrayList<>();
-    
-    public void permutation(int[] arr, int r, int idx) {
-        if (idx == r) {
-            resultList.add(Arrays.copyOf(temp, temp.length));
+    void solve(int cnt, int pos, int visited) {
+        if (cnt > Dist.length) return;
+        if (cnt >= MinCnt) return;
+        
+        for (int i = 0; i < Weak.length; i++) {
+            int nextPos = (pos + i) % Weak.length;
+            int diff = Weak[nextPos] - Weak[pos];
+            
+            if (nextPos < pos)
+                diff += N; 
+            
+            if (diff > Dist[Dist.length - cnt]) 
+                break;
+            
+            visited |= 1 << nextPos;
+        }
+        
+        if (visited == (1 << Weak.length) - 1) {
+            MinCnt = (cnt);
             return;
         }
         
-        for (int i = 0; i < arr.length; i++) {
-            if (visited[i]) continue;
+        for (int i = 0; i < Weak.length; i++) {
+            if ((visited & (1 << i)) != 0) continue;
             
-            temp[idx] = arr[i];
-            visited[i] = true;
-            permutation(arr, r, idx+1);
-            visited[i] = false;
-            
+            solve(cnt + 1, i, visited);
         }
         
     }
-    
-    int upperBound(int[] arr, int target) {
-        int lo = -1;
-        int hi = arr.length + 1;
-        while (lo + 1 < hi) {
-            int mid = lo + (hi - lo) / 2;
-            if (arr[mid] <= target) lo = mid;
-            else hi = mid;
-        }
-        return hi;
-    }
-    
     
     public int solution(int n, int[] weak, int[] dist) {
+        Arrays.sort(dist);
+        N = n;
+        Weak = weak;
+        Dist = dist;
+        MinCnt = INF;
         
-        int answer = INF;
-        int W = weak.length;
-        
-        visited = new boolean[dist.length];
-        temp = new int[dist.length];
-        
-        weak = Arrays.copyOf(weak, W*2);
-        for (int i = W; i < weak.length; i++)
-            weak[i] = weak[i-W] + n;
-        
-        permutation(dist, dist.length, 0);
-        
-        for (int[] result : resultList) {
-            for (int i = 0; i < W; i++) {
-                int start = weak[i];
-                int finish = weak[i+W-1];
-                for (int j = 0; j < result.length; j++) {
-                    start += result[j];
-                    if (start >= finish) {
-                        answer = Math.min(answer, j+1);
-                        break;
-                    }
-                    
-                    int next = upperBound(weak, start);
-                    start = weak[next];
-                }
-            }
+        for (int i = 0; i < Weak.length; i++) {
+            solve(1, i, 0);
         }
         
-        return (answer == INF) ? -1 : answer;
+        if (MinCnt == INF)
+            return -1;
+        
+        return MinCnt;
     }
     
 }
