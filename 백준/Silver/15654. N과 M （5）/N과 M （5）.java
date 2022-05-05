@@ -5,24 +5,22 @@ public class Main {
     
     static int n, m;
     static int[] arr;
-    static int[] res;
+    static int[] num;
     static boolean[] visited;
     static StringBuilder sb = new StringBuilder();
     
     public static void func(int k) {
         if (k == m) {
             for (int i = 0; i < m; i++)
-                sb.append(res[i] + " ");
+                sb.append(num[arr[i]] + " ");
             sb.append("\n");
             return;
         }
         
-        int prev = k - 1;
-        
         for (int i = 0; i < n; i++) {
             if (visited[i]) continue;
             
-            res[k] = arr[i];
+            arr[k] = i;
             
             visited[i] = true;
             func(k+1);
@@ -40,16 +38,16 @@ public class Main {
         m = Integer.parseInt(s[1]);
         
         arr = new int[n];
-        res = new int[n];
+        num = new int[n];
         visited = new boolean[n];
         
         StringTokenizer st = new StringTokenizer(br.readLine());
         
         for (int i = 0; i < n; i++) {
-            arr[i] = Integer.parseInt(st.nextToken());
+            num[i] = Integer.parseInt(st.nextToken());
         }
         
-        Arrays.sort(arr);
+        Arrays.sort(num);
         
         func(0);
         
