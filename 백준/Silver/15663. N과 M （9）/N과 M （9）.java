@@ -7,23 +7,25 @@ public class Main {
     static int[] arr;
     static int[] num;
     static boolean[] visited;
-    static Set<String> set;
+    static StringBuilder sb = new StringBuilder();
     
-    public static void func(int k, int cur) {
+    public static void func(int k) {
         if (k == m) {
-            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < m; i++)
-                sb.append(num[arr[i]] + " ");
-            set.add(sb.toString().trim());
+                sb.append(arr[i] + " ");
+            sb.append("\n");
             return;
         }
         
+        int tmp = 0;
         for (int i = 0; i < n; i++) {
-            if (visited[i]) continue;
+            if (visited[i] || tmp == num[i]) continue;
             
-            arr[k] = i;
+            arr[k] = num[i];
+            tmp = arr[k];
+            
             visited[i] = true;
-            func(k+1, i);
+            func(k+1);
             visited[i] = false;
             
         }
@@ -37,8 +39,6 @@ public class Main {
         n = Integer.parseInt(readString[0]);
         m = Integer.parseInt(readString[1]);
         
-        set = new LinkedHashSet<>();
-        
         arr = new int[n];
         num = new int[n];
         visited = new boolean[n];
@@ -51,22 +51,8 @@ public class Main {
         
         Arrays.sort(num);
         
-        func(0, 0);
+        func(0);
         
-        Iterator<String> it = set.iterator();
-        
-        StringBuilder sb = new StringBuilder();
-        
-        while (it.hasNext()) {
-            String s = it.next();
-            st = new StringTokenizer(s, " ");
-            int len = st.countTokens();
-            for (int i = 0; i < len; i++) {
-                sb.append(st.nextToken() + " ");
-            }
-            sb.append("\n");
-            
-        }
         System.out.println(sb);
 
   }
