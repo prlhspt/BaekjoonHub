@@ -24,7 +24,7 @@ public class Main {
             arr[k] = num[i];
             tmp = num[i];
             visited[i] = true;
-            func(k+1, i);
+            func(k+1, i+1);
             visited[i] = false;
             
         }
