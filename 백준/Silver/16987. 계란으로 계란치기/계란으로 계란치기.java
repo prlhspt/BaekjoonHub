@@ -4,43 +4,35 @@ import java.io.*;
 public class Main {
     
     static int N;
-    static int[][] arr;
-    
-    static int[] rest;
+    static int[] s;
+    static int[] w;
     
     static int ans = 0;
+    static int cnt = 0;
     
     public static void func(int k) {
-        
         if (k == N) {
-            int cnt = 0;
-            for (int i = 0; i < N; i++) {
-                if (rest[i] <= 0) {
-                    cnt++;
-                }
-            }
-            ans = Math.max(cnt, ans);
+            ans = Math.max(ans, cnt);
             return;
         }
-        // 이미 깨져있음
-        if (rest[k] <= 0) {
+        // 이미 깨져있거나 하나빼고 다 깼을 때 
+        // cnt가 N-1 이라는건 하나빼고 다 깨져서 더 깰게 없다는 것
+        if (s[k] <= 0 || cnt == N-1) {
             func(k+1);
             return;
         };
         
         for (int i = 0; i < N; i++) {
-            // 맨 오른쪽 것 빼고 다 깨졌을 때
-            if (k == N - 1 && i == N - 1) {
-                func(k+1);
-                continue;
-            }
-            
-            if (rest[k] <= 0 || rest[i] <= 0 || i == k) continue;
-            rest[k] -= arr[i][1];
-            rest[i] -= arr[k][1];
+            if (s[i] <= 0 || i == k) continue;
+            s[k] -= w[i];
+            s[i] -= w[k];
+            if (s[k] <= 0) cnt++;
+            if (s[i] <= 0) cnt++;
             func(k+1);
-            rest[k] += arr[i][1];
-            rest[i] += arr[k][1];
+            if (s[k] <= 0) cnt--;
+            if (s[i] <= 0) cnt--;
+            s[k] += w[i];
+            s[i] += w[k];
         }
         
     }
@@ -50,16 +42,14 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         N = Integer.parseInt(br.readLine());
-
-        arr = new int[N][2];
-        rest = new int[N];
+        
+        s = new int[N];
+        w = new int[N];
         
         for (int i = 0; i < N; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
-            arr[i][0] = Integer.parseInt(st.nextToken());
-            arr[i][1] = Integer.parseInt(st.nextToken());
-            
-            rest[i] = arr[i][0];
+            s[i] = Integer.parseInt(st.nextToken());
+            w[i] = Integer.parseInt(st.nextToken());
         }
         
         func(0);
