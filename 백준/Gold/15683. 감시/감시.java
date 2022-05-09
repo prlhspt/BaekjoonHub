@@ -144,13 +144,6 @@ public class Main {
     public static void combination(int k, int st) {
 
         if (k == camList.size()) {
-            // for (int i = 0; i < n; i++) {
-            //     for (int j = 0; j < m; j++) {
-            //         System.out.print(rotateArr[i][j] + " ");
-            //     }
-            //     System.out.println();
-            // }
-            // System.out.println();
             solve();
 
             return;
@@ -166,7 +159,7 @@ public class Main {
             int ori = rotateArr[r][c];
 
             for (int j = rotateArr[r][c]; j >= 0; j--) {
-                if (rotateArr[r][c] <= 0) break;
+                if (j <= 0) break;
                 vis[r][c] = true;
                 rotateArr[r][c]--;
                 combination(k+1, i+1);
