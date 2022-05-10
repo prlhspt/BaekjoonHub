@@ -7,7 +7,6 @@ public class Main {
     static int ans = 0;
 
     static int[][] board;
-    static int[][] copyBoard;
 
     static int[][] deepCopy(int[][] arr) {
         int[][] res = new int[arr.length][];
@@ -44,28 +43,49 @@ public class Main {
         int[][] res = new int[n][n];
         for (int i = 0; i < n; i++) {
             for (int j = 0; j < n; j++) {
-                res[i][j] = copyBoard[n-1-j][i];
+                res[i][j] = board[n-1-j][i];
             }
         }
         return res;
     }
 
     static void tilt(int dir) {
-        while(dir-- > 0) copyBoard = rotate();
+        while(dir-- > 0) board = rotate();
         for (int i = 0; i < n; i++) {
             int[] tilted = new int[n];
             int idx = 0;
             for (int j = 0; j < n; j++) {
-                if (copyBoard[i][j] == 0) continue;
+                if (board[i][j] == 0) continue;
                 if (tilted[idx] == 0) {
-                    tilted[idx] = copyBoard[i][j];
-                } else if (tilted[idx] == copyBoard[i][j]) {
+                    tilted[idx] = board[i][j];
+                } else if (tilted[idx] == board[i][j]) {
                     tilted[idx++] *= 2;
                 } else {
-                    tilted[++idx] = copyBoard[i][j];
+                    tilted[++idx] = board[i][j];
                 }
             }
-            copyBoard[i] = Arrays.copyOf(tilted, tilted.length);
+            board[i] = Arrays.copyOf(tilted, tilted.length);
+        }
+    }
+
+    public static void solve(int k) {
+        if (k == 5) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    ans = Math.max(board[i][j], ans);
+                }
+            }
+            return;
+        }
+
+        for (int i = 0; i < 4; i++) {
+            int[][] copy = deepCopy(board);
+            for (int j = 0; j < i; j++) {
+                rotate();
+            }
+            tilt(i);
+            solve(k + 1);
+            board = copy;
         }
     }
 
@@ -81,21 +101,9 @@ public class Main {
                 board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
-        for (int i = 0; i < 1 << (2 * 5); i++) {
-            copyBoard = deepCopy(board);
-            int quot = i;
-            for (int j = 0; j < 5; j++) {
-                int rem = quot % 4;
-                quot /= 4;
-                tilt(rem);
-            }
 
-            for (int a = 0; a < n; a++) {
-                for (int b = 0; b < n; b++) {
-                    ans = Math.max(copyBoard[a][b], ans);
-                }
-            }
-        }
+        solve(0);
+
         System.out.print(ans);
     }
 }
