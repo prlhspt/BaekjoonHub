@@ -7,9 +7,7 @@ public class Main {
     static int ans = 0;
 
     static int[][] board;
-
-    int[] dx = {1, 0, -1, 0};
-    int[] dy = {0, 1, 0, -1};
+    static int[][] copyBoard;
 
     static int[][] deepCopy(int[][] arr) {
         int[][] res = new int[arr.length][];
@@ -23,186 +21,52 @@ public class Main {
         return x < 0 || x >= n || y < 0 || y >= n;
     }
 
-    // 우선 0 없을때까지 당기기
-    // 향하는 방향에 같은 숫자가 있으면 합치기 (2개씩)
-    // r쪽이면 위아래 같은 수 비교하면 될 듯
-    static void move(int dir) {
-        // 위
-        if (dir == 0) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (board[j][i] == 0) {
-                        int tmp = j;
-                        while (true) {
-                            tmp++;
-                            if (OOB(tmp, i)) break;
-
-                            if (board[tmp][i] != 0) {
-                                board[j][i] = board[tmp][i];
-                                board[tmp][i] = 0;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // 합치기
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n - 1; j++) {
-                    if (board[j][i] == board[j+1][i]) {
-                        board[j][i] *= 2;
-                        board[j+1][i] = 0;
-
-                        int tmp = j;
-                        while (true) {
-                            tmp++;
-                            if (OOB(tmp+1, i)) break;
-
-                            board[tmp][i] = board[tmp+1][i];
-                            board[tmp+1][i] = 0;
-
-                        }
-                    }
-                }
-            }
-            // 아래
-        } else if (dir == 2) {
-            for (int i = n-1; i >= 0; i--) {
-                for (int j = n-1; j >= 0; j--) {
-                    if (board[j][i] == 0) {
-                        int tmp = j;
-                        while (true) {
-                            tmp--;
-                            if (OOB(tmp, i)) break;
-
-                            if (board[tmp][i] != 0) {
-                                board[j][i] = board[tmp][i];
-                                board[tmp][i] = 0;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // 합치기
-            for (int i = n-1; i >= 0; i--) {
-                for (int j = n-1; j >= 1; j--) {
-                    if (board[j][i] == board[j-1][i]) {
-                        board[j][i] *= 2;
-                        board[j-1][i] = 0;
-
-                        int tmp = j;
-                        while (true) {
-                            tmp--;
-                            if (OOB(tmp-1, i)) break;
-
-                            board[tmp][i] = board[tmp-1][i];
-                            board[tmp-1][i] = 0;
-
-                        }
-                    }
-                }
-            }
-            // 오른쪽
-        } else if (dir == 1) {
-            for (int i = n-1; i >= 0; i--) {
-                for (int j = n-1; j >= 0; j--) {
-                    if (board[i][j] == 0) {
-                        int tmp = j;
-                        while (true) {
-                            tmp--;
-                            if (OOB(i, tmp)) break;
-
-                            if (board[i][tmp] != 0) {
-                                board[i][j] = board[i][tmp];
-                                board[i][tmp] = 0;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // 합치기
-            for (int i = n-1; i >= 0; i--) {
-                for (int j = n-1; j >= 1; j--) {
-                    if (board[i][j] == board[i][j-1]) {
-                        board[i][j] *= 2;
-                        board[i][j-1] = 0;
-
-                        int tmp = j;
-                        while (true) {
-                            tmp--;
-                            if (OOB(i, tmp-1)) break;
-
-                            board[i][tmp] = board[i][tmp-1];
-                            board[i][tmp-1] = 0;
-
-                        }
-                    }
-                }
-            }
-            // 왼쪽
-        } else if (dir == 3) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    if (board[i][j] == 0) {
-                        int tmp = j;
-                        while (true) {
-                            tmp++;
-                            if (OOB(i, tmp)) break;
-
-                            if (board[i][tmp] != 0) {
-                                board[i][j] = board[i][tmp];
-                                board[i][tmp] = 0;
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            // 합치기
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n-1; j++) {
-                    if (board[i][j] == board[i][j+1]) {
-                        board[i][j] *= 2;
-                        board[i][j+1] = 0;
-
-                        int tmp = j;
-                        while (true) {
-                            tmp++;
-                            if (OOB(i, tmp+1)) break;
-
-                            board[i][tmp] = board[i][tmp+1];
-                            board[i][tmp+1] = 0;
-
-                        }
-                    }
-                }
+    static void tilt1() {
+        int[] arr = {0, 2, 0, 2, 8, 8, 0, 16};
+        int[] tilted = new int[8];
+        int idx = 0;
+        for (int i = 0; i < 8; i++) {
+            if (arr[i] == 0) continue;
+            if (tilted[idx] == 0) {
+                tilted[idx] = arr[i];
+            } else if (tilted[idx] == arr[i]) {
+                tilted[idx] *= 2;
+                idx++;
+            } else {
+                idx++;
+                tilted[idx] = arr[i];
             }
         }
+        System.out.println(Arrays.toString(tilted));
     }
 
-    static void solve(int k) {
-        if (k == 5) {
-            for (int i = 0; i < n; i++) {
-                for (int j = 0; j < n; j++) {
-                    ans = Math.max(board[i][j], ans);
+    static int[][] rotate() {
+        int[][] res = new int[n][n];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                res[i][j] = copyBoard[n-1-j][i];
+            }
+        }
+        return res;
+    }
+
+    static void tilt(int dir) {
+        while(dir-- > 0) copyBoard = rotate();
+        for (int i = 0; i < n; i++) {
+            int[] tilted = new int[n];
+            int idx = 0;
+            for (int j = 0; j < n; j++) {
+                if (copyBoard[i][j] == 0) continue;
+                if (tilted[idx] == 0) {
+                    tilted[idx] = copyBoard[i][j];
+                } else if (tilted[idx] == copyBoard[i][j]) {
+                    tilted[idx++] *= 2;
+                } else {
+                    tilted[++idx] = copyBoard[i][j];
                 }
             }
-            return;
+            copyBoard[i] = Arrays.copyOf(tilted, tilted.length);
         }
-
-        // 4 방향으로 백트래킹 하면 될 듯?
-        for (int i = 0; i < 4; i++) {
-            int[][] copy = deepCopy(board);
-
-            move(i);
-
-            solve(k+1);
-
-            board = copy;
-        }
-
     }
 
     public static void main(String[] args) throws IOException {
@@ -217,10 +81,21 @@ public class Main {
                 board[i][j] = Integer.parseInt(st.nextToken());
             }
         }
+        for (int i = 0; i < 1 << (2 * 5); i++) {
+            copyBoard = deepCopy(board);
+            int quot = i;
+            for (int j = 0; j < 5; j++) {
+                int rem = quot % 4;
+                quot /= 4;
+                tilt(rem);
+            }
 
-        solve(0);
-        
+            for (int a = 0; a < n; a++) {
+                for (int b = 0; b < n; b++) {
+                    ans = Math.max(copyBoard[a][b], ans);
+                }
+            }
+        }
         System.out.print(ans);
-
     }
 }
