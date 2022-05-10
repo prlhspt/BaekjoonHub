@@ -20,25 +20,6 @@ public class Main {
         return x < 0 || x >= n || y < 0 || y >= n;
     }
 
-    static void tilt1() {
-        int[] arr = {0, 2, 0, 2, 8, 8, 0, 16};
-        int[] tilted = new int[8];
-        int idx = 0;
-        for (int i = 0; i < 8; i++) {
-            if (arr[i] == 0) continue;
-            if (tilted[idx] == 0) {
-                tilted[idx] = arr[i];
-            } else if (tilted[idx] == arr[i]) {
-                tilted[idx] *= 2;
-                idx++;
-            } else {
-                idx++;
-                tilted[idx] = arr[i];
-            }
-        }
-        System.out.println(Arrays.toString(tilted));
-    }
-
     static int[][] rotate() {
         int[][] res = new int[n][n];
         for (int i = 0; i < n; i++) {
