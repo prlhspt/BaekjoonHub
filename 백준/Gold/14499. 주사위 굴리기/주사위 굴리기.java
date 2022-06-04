@@ -16,7 +16,7 @@ class Main {
             this.e = 0;
             this.f = 0;
         }
-        
+
         public void up() {
             int temp = a;
             a = f;
@@ -50,14 +50,19 @@ class Main {
         }
 
         public void move(int dir) {
-            if (dir == 0) {
-                right();
-            } else if (dir == 1) {
-                left();
-            } else if (dir == 2) {
-                up();
-            } else {
-                down();
+            switch (dir) {
+                case 0:
+                    right();
+                    break;
+                case 1:
+                    left();
+                    break;
+                case 2:
+                    up();
+                    break;
+                case 3:
+                    down();
+                    break;
             }
         }
 
@@ -69,6 +74,8 @@ class Main {
     public static void main(String[] args) throws IOException {
 
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        StringBuilder sb = new StringBuilder();
 
         StringTokenizer st = new StringTokenizer(br.readLine());
 
@@ -116,7 +123,9 @@ class Main {
                 dice.c = map[nx][ny];
                 map[nx][ny] = 0;
             }
-            System.out.println(dice.f);
+
+            sb.append(dice.f).append("\n");
         }
+        System.out.println(sb);
     }
 }
