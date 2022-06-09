@@ -74,6 +74,10 @@ class Main {
 
                 if (nz == 4 && nx == 4 && ny == 4) {
                     answer = Math.min(answer, now.count + 1);
+                    if (answer == 12) {
+                        System.out.println(12);
+                        System.exit(0);
+                    }
                     continue;
                 }
 
