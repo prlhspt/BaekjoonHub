@@ -2,49 +2,55 @@ import java.util.*;
 
 class Solution {
     
-    class Person {
-        String name;
-        Person parent;
-        int money;
+    class Info {
+        private String parent;
+        private int money;
         
-        public Person(String name, Person parent, int money) {
-            this.name = name;
+        public Info(String parent, int money) {
             this.parent = parent;
             this.money = money;
         }
         
-        public void getReward(int pureMoney) {
-            if (pureMoney <= 0) return;
-            
-            int rest = (int) (pureMoney * 0.1);
-            money += (pureMoney - rest);
-            if (parent != null) 
-                this.parent.getReward(rest);
+        @Override
+        public String toString() {
+            return "parent: " + parent + ", money: " + money + "\n";
         }
+    }
+    
+    public void share(Map<String, Info> map, String seller, int money) {
+        
+        Info info = map.get(seller);
+        
+        info.money += money;
+        money = (int) (money * 0.1);
+        info.money -= money;
+        
+        if (map.get(seller).parent.equals("-") || money <= 0) {
+            return;
+        } 
+            
+        share(map, info.parent, money);
         
     }
     
     public int[] solution(String[] enroll, String[] referral, String[] seller, int[] amount) {
         
         int[] answer = new int[enroll.length];
-        
-        Map<String, Person> personMap = new HashMap<>();
-        
-        for (int i = 0; i < enroll.length; i++) 
-            personMap.put(enroll[i], new Person(enroll[i], null, 0));
-        
-        for (int i = 0; i < enroll.length; i++)
-            if (!referral[i].equals("-")) 
-                personMap.get(enroll[i]).parent = personMap.get(referral[i]);
-        
-        for (int i = 0; i < seller.length; i++)
-            personMap.get(seller[i]).getReward(amount[i] * 100);
 
+        Map<String, Info> map = new HashMap<>();
+        
         for (int i = 0; i < enroll.length; i++) {
-            answer[i] = personMap.get(enroll[i]).money;
+            map.put(enroll[i], new Info(referral[i], 0));
+        }
+        
+        for (int i = 0; i < seller.length; i++) {
+            share(map, seller[i], amount[i]*100);
+        }
+        
+        for (int i = 0; i < enroll.length; i++) {
+            answer[i] = map.get(enroll[i]).money;
         }
         
         return answer;
-            
     }
 }
