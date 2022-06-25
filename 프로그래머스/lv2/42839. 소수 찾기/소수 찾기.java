@@ -1,71 +1,78 @@
-import java.util.*;
-import java.util.stream.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 class Solution {
 
-    Set<Integer> primeSet = new HashSet<>();
+    int N;
+    String[] NUMS;
+    int ANSWER;
 
-    boolean isPrime(int num) {
-        for (int i = 2; i <= Math.sqrt(num); i++) {
-            if (num % i == 0) {
-                return false;
-            }
+    int[] PICK;
+    Set<Long> set = new HashSet<>();
+    boolean[] VISITED;
+
+    public void primeCheck(int r) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < r; i++) {
+            sb.append(NUMS[PICK[i]]);
         }
-        return true;
-    }
 
-    void permutation(int[] arr, int[] output, boolean[] visited, int depth, int n, int r) {
-        if (depth == r) {
-            primeCheck(output, r);
+        long num = Integer.parseInt(sb.toString());
+
+        if (set.contains(num)) {
             return;
         }
 
-        for (int i = 0; i < n; i++) {
-            if (visited[i] != true) {
-                visited[i] = true;
-                output[depth] = arr[i];
-                
-                permutation(arr, output, visited, depth + 1, n, r);
+        set.add(num);
 
-                output[depth] = 0;
-                visited[i] = false;
+        if (num < 2) {
+            return;
+        }
+
+        for (int i = 2; i <= Math.sqrt(num); i++) {
+            if (num % i == 0) {
+                return;
             }
         }
+        ANSWER++;
     }
 
-    void primeCheck(int[] output, int r) {
-        output = Arrays.copyOfRange(output, 0, r);
-        int joinOutput = Integer.parseInt(
-                Arrays.stream(output)
-                        .mapToObj(i -> String.valueOf(i))
-                        .collect(Collectors.joining()));
-        boolean primeFlag;
-        if (joinOutput < 2) {
-            primeFlag = false;
-        } else {
-            primeFlag = isPrime(joinOutput);
+
+
+    public void perm(int k, int r) {
+        if (k == r) {
+            primeCheck(r);
+            return;
         }
 
-
-        if (primeFlag == true) {
-            primeSet.add(joinOutput);
+        for (int i = 0; i < N; i++) {
+            if (VISITED[i]) continue;
+            VISITED[i] = true;
+            PICK[k] = i;
+            perm(k+1, r);
+            VISITED[i] = false;
+            PICK[k] = 0;
         }
     }
 
     public int solution(String numbers) {
-        int[] intNumbers = Arrays.stream(numbers.split(""))
-                .mapToInt(i -> Integer.parseInt(i)).toArray();
 
-        int n = intNumbers.length;
+        N = numbers.length();
+        NUMS = new String[N];
+        VISITED = new boolean[N];
+        PICK = new int[N];
 
-        int[] output = new int[n];
-        boolean[] visited = new boolean[n];
-
-
-        for (int i = 1; i <= n; i++) {
-            permutation(intNumbers, output, visited, 0, n, i);
+        char[] chars = numbers.toCharArray();
+        for (int i = 0; i < N; i++) {
+            NUMS[i] = String.valueOf(chars[i] - '0');
         }
 
-        return primeSet.size();
+        for (int i = 0; i < N; i++) {
+            perm(0, i+1);
+        }
+
+        return ANSWER;
     }
 }
