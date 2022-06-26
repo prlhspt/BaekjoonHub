@@ -1,33 +1,21 @@
 class Solution {
 
-    public StringBuilder solve(long n, StringBuilder sb) {
-        if (n < 3) {
-            if (n != 0) {
-                sb.insert(0, n);
-            }
+    public String[] arr = {"1", "2", "4"};
+
+    public StringBuilder solve(int n, StringBuilder sb) {
+        sb.insert(0, arr[n % 3]);
+        if (n / 3 == 0) {
             return sb;
         }
-        if (n % 3 == 0) {
-            sb.insert(0, n % 3);
-            sb = solve((n - 3) / 3, sb);
-
-        } else {
-            sb.insert(0, n % 3);
-            sb = solve(n / 3, sb);
-        }
-
-        return sb;
+        return solve(n / 3 - 1, sb);
     }
 
     public String solution(int n) {
+        n--;
+
         StringBuilder sb = new StringBuilder();
-
         sb = solve(n, sb);
-        String answer = sb.toString().replace("0", "4");
-        answer = answer.replace("3", "4");
 
-        System.out.println("answer = " + answer);
-
-        return answer;
+        return sb.toString();
     }
 }
