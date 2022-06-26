@@ -44,9 +44,9 @@ class Solution {
             }
 
             List<Map.Entry<String, Integer>> collect = MAP.entrySet().stream()
-                    .sorted(((o1, o2) -> Integer.compare(o2.getValue(), o1.getValue())))
+                    .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
                     .collect(Collectors.toList());
-
+            
             int count = 2;
 
             for (Map.Entry<String, Integer> entry : collect) {
