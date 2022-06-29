@@ -1,30 +1,23 @@
-import java.util.*;
-import java.util.regex.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 class Solution {
     public boolean solution(String[] phone_book) {
+        Set<String> set = new HashSet<>();
 
-        Map<String, Integer> map = new HashMap<>();
-
-        for (String p : phone_book) {
-            map.put(p, 1);
-        }
-
-        String temp;
-
-        for (String p : phone_book) {
-            temp = "";
-            for (int i = 0; i < p.length(); i++) {
-                char c = p.charAt(i);
-
-                temp = temp + c;
-
-                if (map.getOrDefault(temp, -1) > 0 && !temp.equals(p)) {
+        Arrays.sort(phone_book);
+        
+        for (String s : phone_book) {
+            StringBuilder sb = new StringBuilder();
+            for (char c : s.toCharArray()) {
+                sb.append(c);
+                if (set.contains(sb.toString())) {
                     return false;
                 }
             }
+            set.add(sb.toString());
         }
-
         return true;
     }
 }
