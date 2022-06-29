@@ -1,7 +1,11 @@
 import java.util.*;
 
-class Solution {
+// String보다 Map이 더 빠르게 동작했다.
+// List만 가지고 있는 상태에서 마지막에 정렬하는것보다 map이 가지고 있는 list를 for문으로 돌려서 정렬하는게 훨씬 빠르다. (정답이 갈린 포인트1)
+// info 배열이 50000개밖에 안되지만 이분 탐색을 돌려야 한다. (정답이 갈린 포인트2)
 
+class Solution {
+    
     public int findCount(List<Integer> temp4, int wantScore) {
 
         if (temp4.size() == 1) {
@@ -39,18 +43,27 @@ class Solution {
         Map<String, List<String>> foodMap = Map.of("-", List.of("chicken", "pizza"),
                 "chicken", List.of("chicken"), "pizza", List.of("pizza"));
 
-        Map<String, List<Integer>> people = new HashMap<>();
+        Map<String, Map<String, Map<String, Map<String, List<Integer>>>>> people = new HashMap<>();
 
         for (String s : info) {
             String[] split = s.split(" ");
-            StringBuilder sb = new StringBuilder();
-            sb.append(split[0]).append(split[1]).append(split[2]).append(split[3]);
-            people.computeIfAbsent(sb.toString(), k -> new ArrayList<>()).add(Integer.valueOf(split[4]));
+            people.computeIfAbsent(split[0], k -> new HashMap<>())
+                    .computeIfAbsent(split[1], k -> new HashMap<>())
+                    .computeIfAbsent(split[2], k -> new HashMap<>())
+                    .computeIfAbsent(split[3], k -> new ArrayList<>())
+                    .add(Integer.valueOf(split[4]));
         }
 
-        for (List<Integer> value : people.values()) {
-            Collections.sort(value);
+        for (Map<String, Map<String, Map<String, List<Integer>>>> value : people.values()) {
+            for (Map<String, Map<String, List<Integer>>> stringMapMap : value.values()) {
+                for (Map<String, List<Integer>> stringListMap : stringMapMap.values()) {
+                    for (List<Integer> list : stringListMap.values()) {
+                        Collections.sort(list);
+                    }
+                }
+            }
         }
+
 
         int[] answer = new int[query.length];
         for (int i = 0; i < query.length; i++) {
@@ -60,33 +73,37 @@ class Solution {
             String wantFood = spaceSplit[0];
             int wantScore = Integer.parseInt(spaceSplit[1]);
 
-            StringBuilder sb = new StringBuilder();
+            // 언어
             List<String> lang = langMap.get(split[0]);
-            for (String s : lang) {
-                sb.append(s);
-                List<String> group = groupMap.get(split[1]);
-                for (String s1 : group) {
-                    sb.append(s1);
-                    List<String> career = careerMap.get(split[2]);
-                    for (String s2 : career) {
-                        sb.append(s2);
-                        List<String> food = foodMap.get(wantFood);
-                        for (String s3 : food) {
-                            sb.append(s3);
-                            List<Integer> list = people.get(sb.toString());
-                            if (list != null) {
-                                count += findCount(list, wantScore);
+            for (String s1 : lang) {
+                Map<String, Map<String, Map<String, List<Integer>>>> temp1 = people.get(s1);
+                if (temp1 != null) {
+                    // 직군
+                    List<String> group = groupMap.get(split[1]);
+                    for (String s2 : group) {
+                        Map<String, Map<String, List<Integer>>> temp2 = temp1.get(s2);
+                        if (temp2 != null) {
+                            // 경력
+                            List<String> career = careerMap.get(split[2]);
+                            for (String s3 : career) {
+                                Map<String, List<Integer>> temp3 = temp2.get(s3);
+                                if (temp3 != null) {
+                                    // 소울 푸드
+                                    List<String> food = foodMap.get(wantFood);
+                                    for (String s4 : food) {
+                                        List<Integer> temp4 = temp3.get(s4);
+                                        if (temp4 != null) {
+                                            count += findCount(temp4, wantScore);
+                                        }
+                                    }
+                                }
                             }
-                            sb.delete(sb.length() - s3.length(), sb.length());
-                        }
-                        sb.delete(sb.length() - s2.length(), sb.length());
-                    }
-                    sb.delete(sb.length() - s1.length(), sb.length());
-                }
-                sb.delete(sb.length() - s.length(), sb.length());
-            }
 
-            answer[i] = count;
+                        }
+                    }
+                }
+            }
+        answer[i] = count;
         }
 
         return answer;
