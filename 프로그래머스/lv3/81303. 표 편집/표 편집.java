@@ -1,51 +1,98 @@
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Deque;
-import java.util.List;
 
 class Solution {
-    public String solution(int n, int k, String[] cmd) {
-        Deque<Integer> deque = new ArrayDeque<>();
-        List<Integer> table = new ArrayList<>();
 
-        for (int i = 0; i < n; i++) {
-            table.add(i);
+    static class Node {
+        private int index;
+
+        private Node prev;
+        private Node next;
+
+        public Node(int index) {
+            this.index = index;
+        }
+
+        public int getIndex() {
+            return index;
+        }
+
+        public Node getPrev() {
+            return prev;
+        }
+
+        public Node getNext() {
+            return next;
+        }
+
+        boolean hasNext() {
+            return next.index != -1;
+        }
+
+        public void restore() {
+            prev.next = this;
+            next.prev = this;
+        }
+
+        public void remove() {
+            prev.next = next;
+            next.prev = prev;
+        }
+
+        private static Node initList(int n) {
+            Node start = new Node(-1);
+            Node prev = start;
+            Node curr = null;
+            for (int i = 0; i < n; i++) {
+                curr = new Node(i);
+                prev.next = curr;
+                curr.prev = prev;
+                prev = curr;
+            }
+            curr.next = new Node(-1);
+            return start.next;
+        }
+    }
+
+
+    public String solution(int n, int k, String[] cmd) {
+        Node curr = Node.initList(n);
+        Deque<Node> deque = new ArrayDeque<>();
+
+        for (int i = 0; i < k; i++) {
+            curr = curr.getNext();
         }
 
         for (String s : cmd) {
             if (s.contains("U")) {
-                String[] split = s.split(" ");
-                int num = Integer.parseInt(split[1]);
-                k -= num;
+                int distance = getDistance(s);
+                while (distance-- > 0) {
+                    curr = curr.getPrev();
+                }
             } else if (s.contains("D")) {
-                String[] split = s.split(" ");
-                int num = Integer.parseInt(split[1]);
-                k += num;
+                int distance = getDistance(s);
+                while (distance-- > 0) {
+                    curr = curr.getNext();
+                }
             } else if (s.contains("C")) {
-                int remove = table.remove(k);
-                deque.offer(remove);
-                if (k == table.size() - 1) {
-                    k--;
-                }
+                deque.offer(curr);
+                curr.remove();
+                curr = curr.hasNext() ? curr.getNext() : curr.getPrev();
             } else {
-                int num = deque.pollLast();
-                if (num >= table.size()) {
-                    table.add(num);
-                } else {
-                    table.add(num, 1);
-                }
+                deque.pollLast().restore();
             }
         }
 
-        String[] answer = new String[n];
-        for (int i = 0; i < n; i++) {
-            answer[i] = "O";
+        StringBuilder sb = new StringBuilder("O".repeat(n));
+        while (!deque.isEmpty()) {
+            sb.setCharAt(deque.pollLast().getIndex(), 'X');
         }
 
-        for (int i : deque) {
-            answer[i] = "X";
-        }
-
-        return String.join("", answer);
+        return sb.toString();
     }
+
+    private int getDistance(String s) {
+        return Integer.parseInt(s.split(" ")[1]);
+    }
+
 }
